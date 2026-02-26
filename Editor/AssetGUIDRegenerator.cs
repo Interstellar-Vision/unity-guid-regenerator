@@ -80,16 +80,16 @@ namespace Jads.Tools
         [MenuItem("Assets/Regenerate GUID/Files Only")]
         public static void RegenerateGUID_Implementation()
         {
-            DoImplementation(false);
+            GenerateNewGUID(false);
         }
 
         [MenuItem("Assets/Regenerate GUID/Files and Folders")]
         public static void RegenerateGUIDWithFolders_Implementation()
         {
-            DoImplementation(true);
+            GenerateNewGUID(true);
         }
 
-        private static void DoImplementation(bool includeFolders)
+        public static void GenerateNewGUID(bool includeFolders)
         {
             var assetGUIDS = AssetGUIDRegenerator.ExtractGUIDs(Selection.assetGUIDs, includeFolders);
 
@@ -100,16 +100,30 @@ namespace Jads.Tools
 
             if (option == 0)
             {
-                AssetDatabase.StartAssetEditing();
-                AssetGUIDRegenerator.RegenerateGUIDs(assetGUIDS);
-                AssetDatabase.StopAssetEditing();
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                ExecuteGUIDChange(assetGUIDS);
             }
             else if (option == 2)
             {
                 Application.OpenURL("https://github.com/jeffjads/unity-guid-regenerator/blob/master/README.md");
             }
+        }
+
+        public static void GenerateNewGUIDFromPath(string path, bool includeFolder)
+        {
+            string folderGUID = AssetDatabase.AssetPathToGUID(path);
+
+            var assetGUIDS = AssetGUIDRegenerator.ExtractGUIDs(new string[]{folderGUID} , includeFolder);
+
+            ExecuteGUIDChange(assetGUIDS);
+        }
+
+        private static void ExecuteGUIDChange(string [] assetGUIDS)
+        {
+                AssetDatabase.StartAssetEditing();
+                AssetGUIDRegenerator.RegenerateGUIDs(assetGUIDS);
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
         }
     }
 
